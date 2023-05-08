@@ -10,6 +10,7 @@ import IUser from '../../interfaces/IUser'
 import { useChat } from '../../contexts/ChatContextProvider'
 import ChatList from './ChatList'
 import IChat from '../../interfaces/IChat'
+import CreateNewChat from './CreateNewChat'
 
 export default function Chat() {
   const { isAuthenticated, user:myUser } = useAuth()
@@ -20,6 +21,7 @@ export default function Chat() {
   return (
     <Container>
       <Sidebar>
+        <CreateNewChat />
         <TitleText size='m' color='purple'>Chat list</TitleText>
         {(isAuthenticated && !isUserChatsLoading) && 
         userChats.map((user: IChat) => (
@@ -38,7 +40,7 @@ const Container = styled.div`
   background-color: aquamarine;
   flex: 1;
   overflow: hidden;
-`
+  `
 
 const Sidebar = styled.aside`
   display: flex;
