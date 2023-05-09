@@ -55,7 +55,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setIsAuthenticated(true)
     },
     onError: (error, variables, context) => {
-      console.log(error)
+      console.warn(error)
       toast.error("Invalid credentials")
     },
     onMutate() {
@@ -70,15 +70,10 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const signInMutation = useMutation<LoginResponse, AxiosError, LoginCredentials, any>({
     mutationFn: login,
     onSuccess: (data, variables) => {
-      setUser({
-        _id: data.id,
-        name: variables.name,
-      })
-      localStorage.setItem('@chat:userId', data.id)
-      setIsAuthenticated(true)
+      handleLogIn({_id: data.id, name: variables.name})
     },
     onError: (error, variables, context) => {
-      console.log(error)
+      console.warn(error)
       toast.error("Invalid credentials")
     },
     onMutate() {
@@ -93,12 +88,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const refreshMutation = useMutation<RefreshResponse, AxiosError, {id: string}, any>({
     mutationFn: refresh,
     onSuccess: (data, variables) => {
-      setUser({
-        _id: data.id,
-        name: data.name,
-      })
-      
-      setIsAuthenticated(true)
+      handleLogIn({_id: data.id, name: data.name})
     },
     onMutate() {
       const id = toast.loading('Refreshing...')
@@ -109,14 +99,28 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   })
 
+  const handleLogIn = (user:IUser) => {
+    setUser(user)
+    localStorage.setItem('@chat:userId', user._id)
+    sessionStorage.setItem('@chat:user', JSON.stringify(user))
+    setIsAuthenticated(true)
+  }
+
   
   const signOut = () => {
     setUser(undefined)
     setIsAuthenticated(false)
     localStorage.removeItem('@chat:userId')
+    sessionStorage.removeItem('@chat:user')
   }
   
   const handleRefresh = () => {
+    const user = sessionStorage.getItem('@chat:user')
+    if (user !== null) {
+      const parsedUser = JSON.parse(user)
+      handleLogIn(parsedUser)
+      return
+    }
     const userId = localStorage.getItem('@chat:userId')
     if (userId === null) return
     refreshMutation.mutate({id: userId})
