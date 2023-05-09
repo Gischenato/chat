@@ -38,5 +38,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </AuthContextProvider>
       </QueryClientProvider>
     </ThemeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
+  ,
 )
