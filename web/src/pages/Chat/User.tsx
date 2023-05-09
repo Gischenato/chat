@@ -6,15 +6,14 @@ import styled from 'styled-components'
 import { RegularText } from '../../styles/typography'
 import { Link } from 'react-router-dom'
 
-interface ChatListProps {
+interface UserProps {
   chat: IChat
   user: IUser
 }
 
-export default function ChatList({chat, user}: ChatListProps) {
+export default function User({chat, user}: UserProps) {
   const { data, status } = useFetchUser(chat, user)
 
-  console.log(chat)
   if (status === 'loading') return <p>Loading...</p>
   if (status === 'error') return <p>Error fetching {chat._id}</p>
 
