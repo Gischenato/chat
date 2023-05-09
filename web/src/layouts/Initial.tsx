@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet, Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { useAuth } from '../contexts/AuthContextProvider'
+import { useAuth } from '@contexts/AuthContextProvider'
 
 export default function Initial() {
   const { user, isAuthenticated, signOut } = useAuth()

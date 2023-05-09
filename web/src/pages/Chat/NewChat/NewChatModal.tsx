@@ -1,9 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useChat } from '../../../contexts/ChatContextProvider'
-import User from '../User'
+import { useChat } from '@contexts/ChatContextProvider'
 import NewUser from './NewUser'
-import { TitleText } from '../../../styles/typography'
+import { TitleText } from '@styles/typography'
 import { useNavigate } from 'react-router-dom'
 
 interface NewChatModalProps {

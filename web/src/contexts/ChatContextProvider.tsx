@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState } from 'react'
 import { UseMutationResult, useMutation, useQuery } from '@tanstack/react-query'
-import { getChat } from '../util/api/chats/getChat'
-import IUser from '../interfaces/IUser'
-import { getAllUsers } from '../util/api/users/getAll'
-import IChat from '../interfaces/IChat'
-import { postNewChat } from '../util/api/chats/createNewChat'
-import IPostNewChat from '../interfaces/IPostNewChat'
+import { getChat } from '@util/api/chats/getChat'
+import IUser from '@interfaces/IUser'
+import { getAllUsers } from '@util/api/users/getAll'
+import IChat from '@interfaces/IChat'
+import { postNewChat } from '@util/api/chats/createNewChat'
+import IPostNewChat from '@interfaces/IPostNewChat'
 import { Id, toast } from 'react-toastify'
 
 interface ChatContextData {

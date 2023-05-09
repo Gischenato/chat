@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { findUser } from '../util/api/users/findUser'
-import IChat from '../interfaces/IChat'
-import IUser from '../interfaces/IUser'
+import { findUser } from '@util/api/users/findUser'
+import IChat from '@interfaces/IChat'
+import IUser from '@interfaces/IUser'
 
 export const useFetchUser = (chat:IChat, user:IUser) => {
     const recipientId = chat.members.find((id) => id !== user._id)

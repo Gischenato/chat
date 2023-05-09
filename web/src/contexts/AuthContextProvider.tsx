@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import IUser from '../interfaces/IUser'
+import IUser from '@interfaces/IUser'
 import { useQuery, useMutation, UseMutationResult } from '@tanstack/react-query'
-import { register } from '../util/api/users/register'
+import { register } from '@util/api/users/register'
 import { AxiosError } from 'axios'
-import { login } from '../util/api/auth/login'
-import { refresh } from '../util/api/auth/refresh'
+import { login } from '@util/api/auth/login'
+import { refresh } from '@util/api/auth/refresh'
 import { toast } from 'react-toastify'
 
 interface AuthContextData {

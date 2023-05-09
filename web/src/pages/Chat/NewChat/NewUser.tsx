@@ -1,7 +1,7 @@
 import React from 'react'
-import IUser from '../../../interfaces/IUser'
+import IUser from '@interfaces/IUser'
 import styled from 'styled-components'
-import { RegularText } from '../../../styles/typography'
+import { RegularText } from '@styles/typography'
 import { Link } from 'react-router-dom'
 
 interface NewUserProps {

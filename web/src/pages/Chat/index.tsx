@@ -1,10 +1,10 @@
 import { useParams } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContextProvider'
+import { useAuth } from '@contexts/AuthContextProvider'
 import styled from 'styled-components'
-import { TitleText } from '../../styles/typography'
-import { useChat } from '../../contexts/ChatContextProvider'
+import { TitleText } from '@styles/typography'
+import { useChat } from '@contexts/ChatContextProvider'
 import User from './User'
-import IChat from '../../interfaces/IChat'
+import IChat from '@interfaces/IChat'
 import CreateNewChat from './CreateNewChat'
 
 export default function Chat() {

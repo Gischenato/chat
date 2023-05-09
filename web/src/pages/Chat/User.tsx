@@ -1,9 +1,9 @@
 import React from 'react'
-import IChat from '../../interfaces/IChat'
-import { useFetchUser } from '../../hooks/useFetchUser'
-import IUser from '../../interfaces/IUser'
+import IChat from '@interfaces/IChat'
+import { useFetchUser } from '@hooks/useFetchUser'
+import IUser from '@interfaces/IUser'
 import styled from 'styled-components'
-import { RegularText } from '../../styles/typography'
+import { RegularText } from '@styles/typography'
 import { Link } from 'react-router-dom'
 
 interface UserProps {

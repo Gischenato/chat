@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useAuth } from '../contexts/AuthContextProvider'
+import { useAuth } from '@contexts/AuthContextProvider'
 import { useNavigate } from 'react-router-dom'
 
 export default function Register() {

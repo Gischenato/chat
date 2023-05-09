@@ -1,6 +1,6 @@
-import ChatContextProvider from './contexts/ChatContextProvider'
-import { useAuth } from './contexts/AuthContextProvider'
-import Router from './routes/Router'
+import ChatContextProvider from '@contexts/ChatContextProvider'
+import { useAuth } from '@contexts/AuthContextProvider'
+import Router from '@routes/Router'
 
 function App() {
   const { user } = useAuth()
