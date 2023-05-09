@@ -1,14 +1,9 @@
-import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContextProvider'
 import styled from 'styled-components'
-import { RegularText, TitleText } from '../../styles/typography'
-import { useQuery } from '@tanstack/react-query'
-import { getAllUsers } from '../../util/api/users/getAll'
-import Users from './Users'
-import IUser from '../../interfaces/IUser'
+import { TitleText } from '../../styles/typography'
 import { useChat } from '../../contexts/ChatContextProvider'
-import ChatList from './ChatList'
+import User from './User'
 import IChat from '../../interfaces/IChat'
 import CreateNewChat from './CreateNewChat'
 
@@ -24,8 +19,8 @@ export default function Chat() {
         <CreateNewChat />
         <TitleText size='m' color='purple'>Chat list</TitleText>
         {(isAuthenticated && !isUserChatsLoading) && 
-        userChats.map((user: IChat) => (
-          <ChatList key={user._id} chat={user} user={myUser!}/>
+          userChats!.map((user: IChat) => (
+          <User key={user._id} chat={user} user={myUser!}/>
         ))}
       </Sidebar>
       {userId}
@@ -50,6 +45,18 @@ const Sidebar = styled.aside`
   gap: 12px;
   padding: 1rem;
   background-color: ${({ theme }) => theme.colors['base-button']};
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
+
+  ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #a3a3a3;
+    border-radius: 8px;
+}
 `

@@ -2,7 +2,7 @@ import React from 'react'
 import { PlusCircle, } from 'phosphor-react'
 import styled, { useTheme } from 'styled-components'
 import { RegularText } from '../../styles/typography'
-import NewChatModal from './NewChatModal'
+import NewChatModal from './NewChat/NewChatModal'
 
 export default function CreateNewChat() {
   const { colors } = useTheme()
