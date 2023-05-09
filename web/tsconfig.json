@@ -18,6 +18,24 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     // "noFallthroughCasesInSwitch": true
+
+    // configure path aliases
+    "baseUrl": "./src",
+    "paths": {
+      // hooks
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@utils/*": ["utils/*"],
+      "@styles/*": ["styles/*"],
+      "@assets/*": ["assets/*"],
+      "@types/*": ["@types/*"],
+      "@layouts/*": ["layouts/*"],
+      "@contexts/*": ["contexts/*"],
+      "@routes/*": ["routes/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@/*": ["*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
