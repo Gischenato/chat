@@ -26,7 +26,7 @@
       "@hooks/*": ["hooks/*"],
       "@components/*": ["components/*"],
       "@pages/*": ["pages/*"],
-      "@utils/*": ["utils/*"],
+      "@util/*": ["util/*"],
       "@styles/*": ["styles/*"],
       "@assets/*": ["assets/*"],
       "@types/*": ["@types/*"],
