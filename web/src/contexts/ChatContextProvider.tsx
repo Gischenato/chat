@@ -7,13 +7,14 @@ import IChat from '@interfaces/IChat'
 import { postNewChat } from '@util/api/chats/createNewChat'
 import IPostNewChat from '@interfaces/IPostNewChat'
 import { Id, toast } from 'react-toastify'
+import IPostNewChatResponse from '@interfaces/IPostNewChatResponse'
 
 interface ChatContextData {
   userChats: IChat[] | undefined
   isUserChatsLoading: boolean
   userChatsError: boolean
   potentialChats: IUser[] | undefined
-  createNewChatMutation: UseMutationResult<any, unknown, IPostNewChat, unknown>
+  createNewChatMutation: UseMutationResult<IPostNewChatResponse, unknown, IPostNewChat, unknown>
 }
 
 interface ChatContextProviderProps {
@@ -29,7 +30,11 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
   const chatsQuery = useQuery<IChat[]>({
     queryKey: ['chats', user?._id],
     enabled: user !== undefined && user !== null,
-    queryFn: () => getChat(user!._id),
+    queryFn: async () => {
+      const response = await getChat(user!._id)
+      response.sort((a, b) => a.updatedAt < b.updatedAt ? 1 : -1)
+      return response
+    },
   })
 
   const allUsersQuery = useQuery<IUser[]>({
@@ -46,10 +51,12 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
     refetchOnWindowFocus: false,
   })
 
-  const createNewChatMutation = useMutation<any, any, IPostNewChat, {id:Id}>({
+  const createNewChatMutation = useMutation<IPostNewChatResponse, any, IPostNewChat, {id:Id}>({
     mutationFn: postNewChat,
     onSuccess: (data, variables) => {
       console.log('0k')
+      // chatsQuery.data?.push(data) / if we want to add the new chat to the list without refetching
+      chatsQuery.refetch() // refetching to get the new chat
     },
     onError: (error, variables, context) => {
       console.warn(error)
