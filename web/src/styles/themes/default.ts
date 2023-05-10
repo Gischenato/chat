@@ -25,6 +25,7 @@ export const defaultTheme = {
     fonts: {
       title: "'Baloo 2'",
       text: "'Roboto'",
+      sand: "'Quicksand'"
     },
   
     fontSizes: {
