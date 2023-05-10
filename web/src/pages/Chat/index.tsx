@@ -1,61 +1,47 @@
-import { useParams } from 'react-router-dom'
 import { useAuth } from '@contexts/AuthContextProvider'
+import { useFetchChat } from '@hooks/useFetchChatMessages'
+import { useFetchUser } from '@hooks/useFetchUser'
+import { useFindUser } from '@hooks/useFindUser'
+import { RegularText, TitleText } from '@styles/typography'
+import { useQuery } from '@tanstack/react-query'
+import { getMessages } from '@util/api/messages/getMessages'
+import { findUser } from '@util/api/users/findUser'
+import React from 'react'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { TitleText } from '@styles/typography'
-import { useChat } from '@contexts/ChatContextProvider'
-import User from './User'
-import IChat from '@interfaces/IChat'
-import CreateNewChat from './CreateNewChat'
-import { Outlet } from 'react-router-dom'
+import Message from './Message'
 
 export default function Chat() {
-  const { isAuthenticated, user:myUser } = useAuth()
-  const { isUserChatsLoading, userChats, userChatsError } = useChat()
+  const { chatId, userId } = useParams()
+  const { user:myUser } = useAuth()
+  const { data:otherUser } = useFindUser(userId)
+
+  const messagesQuery = useQuery({
+    queryKey: ['messages', chatId],
+    queryFn: () => getMessages(chatId),
+  })
+  
   
   return (
     <Container>
-      <Sidebar>
-        <CreateNewChat />
-        <TitleText size='m' color='purple'>Chat list</TitleText>
-        {(isAuthenticated && !isUserChatsLoading) && 
-          userChats!.map((user: IChat) => (
-          <User key={user._id} chat={user} user={myUser!}/>
-        ))}
-      </Sidebar>
-      <Outlet />
+      <TitleText>Chat with </TitleText>
+      <RegularText>Chat  id: {chatId}</RegularText>
+      <RegularText>My    id: {myUser?._id}</RegularText>
+      <RegularText>Other id: {userId}</RegularText>
+      {/* <RegularText>Other id: {._id}</RegularText> */}
+      <br/>
+      <br/>
+      <RegularText>Messages:</RegularText>
+      { messagesQuery.status === 'loading' && <p>Loading...</p>}
+      { messagesQuery.status === 'error' && <p>Error fetching messages</p>}
+      { messagesQuery.status === 'success' && messagesQuery.data.map(msg => <Message key={msg._id} message={msg}/>)}
     </Container>
   )
 }
 
+
 const Container = styled.div`
   display: flex;
-  box-sizing: border-box;
-  gap: 12px;
-  background-color: aquamarine;
-  flex: 1;
-  overflow: hidden;
-  `
-
-const Sidebar = styled.aside`
-  display: flex;
-  box-sizing: border-box;
   flex-direction: column;
-  width: 15%;
-  gap: 12px;
-  padding: 1rem;
-  background-color: ${({ theme }) => theme.colors['base-button']};
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: #a3a3a3;
-    border-radius: 8px;
-}
+  line-height: 1.3;
 `

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import { UseMutationResult, useMutation, useQuery } from '@tanstack/react-query'
-import { getChat } from '@util/api/chats/getChat'
+import { getChat } from '@util/api/chats/getUserChat'
 import IUser from '@interfaces/IUser'
 import { getAllUsers } from '@util/api/users/getAll'
 import IChat from '@interfaces/IChat'
