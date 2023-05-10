@@ -6,13 +6,12 @@ import { useChat } from '@contexts/ChatContextProvider'
 import User from './User'
 import IChat from '@interfaces/IChat'
 import CreateNewChat from './CreateNewChat'
+import { Outlet } from 'react-router-dom'
 
 export default function Chat() {
   const { isAuthenticated, user:myUser } = useAuth()
   const { isUserChatsLoading, userChats, userChatsError } = useChat()
   
-  const { userId } = useParams()
-
   return (
     <Container>
       <Sidebar>
@@ -23,7 +22,7 @@ export default function Chat() {
           <User key={user._id} chat={user} user={myUser!}/>
         ))}
       </Sidebar>
-      {userId}
+      <Outlet />
     </Container>
   )
 }
