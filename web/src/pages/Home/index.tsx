@@ -18,8 +18,8 @@ export default function Home() {
         <CreateNewChat />
         <TitleText size='m' color='purple'>Chat list</TitleText>
         {(isAuthenticated && !isUserChatsLoading) && 
-          userChats!.map((user: IChat) => (
-          <User key={user._id} chat={user} user={myUser!}/>
+          userChats!.map((chat: IChat) => (
+          <User key={chat._id} chat={chat} user={myUser!}/>
         ))}
       </Sidebar>
       <Outlet />

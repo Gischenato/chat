@@ -6,6 +6,7 @@ import { TitleText } from '@styles/typography'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@contexts/AuthContextProvider'
 import { toast } from 'react-toastify'
+import IUser from '@interfaces/IUser'
 
 interface NewChatModalProps {
   isOpen: boolean,
@@ -15,13 +16,12 @@ interface NewChatModalProps {
 export default function NewChatModal({ isOpen, closeModal }: NewChatModalProps) {
   const handleInnerClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation()
-    console.log("AAIUEO")
   }
   const { user:myUser } = useAuth()
   const { potentialChats, createNewChatMutation } = useChat()
   const navigate = useNavigate()
 
-  const createNewChat = (user: any) => {
+  const createNewChat = (user: IUser) => {
     if (!myUser) return
     console.log("create new chat with", user)
     createNewChatMutation.mutate({
@@ -30,7 +30,7 @@ export default function NewChatModal({ isOpen, closeModal }: NewChatModalProps) 
     }, {
       onSuccess: (data) => {
         const { _id } = data
-        navigate(`/chat/${_id}`)
+        navigate(`/chat/${_id}/${user._id}`)
       },
       onError: (error) => {
         console.log(error)

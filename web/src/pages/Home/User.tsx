@@ -18,7 +18,7 @@ export default function User({chat, user}: UserProps) {
   if (status === 'error') return <p>Error fetching {chat._id}</p>
 
   return (
-    <StyledLink to={`/chat/${data!._id}`}>
+    <StyledLink to={`/chat/${chat._id}/${data!._id}`}>
       <RegularText>{data!.name}</RegularText>
     </StyledLink>
   )
