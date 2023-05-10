@@ -4,6 +4,8 @@ import { useChat } from '@contexts/ChatContextProvider'
 import NewUser from './NewUser'
 import { TitleText } from '@styles/typography'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@contexts/AuthContextProvider'
+import { toast } from 'react-toastify'
 
 interface NewChatModalProps {
   isOpen: boolean,
@@ -15,11 +17,30 @@ export default function NewChatModal({ isOpen, closeModal }: NewChatModalProps) 
     e.stopPropagation()
     console.log("AAIUEO")
   }
-  const { potentialChats } = useChat()
+  const { user:myUser } = useAuth()
+  const { potentialChats, createNewChatMutation } = useChat()
   const navigate = useNavigate()
 
   const createNewChat = (user: any) => {
+    if (!myUser) return
     console.log("create new chat with", user)
+    createNewChatMutation.mutate({
+      firstId: myUser._id,
+      secondId: user._id,
+    }, {
+      onSuccess: (data) => {
+        const { _id } = data
+        navigate(`/chat/${_id}`)
+      },
+      onError: (error) => {
+        console.log(error)
+        toast('Error creating new chat')
+      },
+      onSettled: () => {
+        closeModal()
+      }
+    }
+    )
     navigate(`/chat/teste`)
   }
 
@@ -28,9 +49,7 @@ export default function NewChatModal({ isOpen, closeModal }: NewChatModalProps) 
       <InnerContainer onClick={handleInnerClick}>
         <TitleText color='yellow-dark'>New chat with</TitleText>
         { potentialChats &&
-          potentialChats.map(user =>
-            <NewUser key={user._id} user={user} createNewChat={createNewChat}/>
-          )
+          potentialChats.map(user => <NewUser key={user._id} user={user} createNewChat={createNewChat}/>)
         }
       </InnerContainer>
     </ModalContainer>
