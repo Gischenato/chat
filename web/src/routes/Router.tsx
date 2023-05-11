@@ -4,7 +4,6 @@ import Initial from '@layouts/Initial'
 import Home from '@pages/Home'
 import Login from '@pages/Login'
 import Register from '@pages/Register'
-import Test from '@pages/Test'
 import Chat from '@pages/Chat'
 
 export default function Router() {
@@ -12,7 +11,6 @@ export default function Router() {
     <Routes>
     <Route path='/' element={<Initial />}>
       <Route path="/" element={<Home />}>
-        <Route path="/" element={<Test />} />
         <Route path="/chat/:chatId/:userId" element={<Chat />} />
       </Route>
       <Route path="/login" element={<Login />} />
