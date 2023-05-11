@@ -30,7 +30,6 @@ export default function Home() {
 const Container = styled.div`
   display: flex;
   box-sizing: border-box;
-  gap: 12px;
   background-color: aquamarine;
   flex: 1;
   overflow: hidden;
@@ -43,7 +42,7 @@ const Sidebar = styled.aside`
   width: 15%;
   gap: 12px;
   padding: 1rem;
-  background-color: ${({ theme }) => theme.colors['base-button']};
+  background-color: ${({ theme }) => theme.colors['background']};
   overflow-y: auto;
   overflow-x: hidden;
 
