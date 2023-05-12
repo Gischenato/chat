@@ -1,0 +1,44 @@
+{
+    "settings": {
+        "import/resolver": {
+          "typescript": {}
+        }
+      },
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfigRootDir": "./"
+      },
+    "rules": {
+    //   "@typescript-eslint/member-delimiter-style": ["error", {
+    //     "multiline": {
+    //       "delimiter": "none",    // 'none' or 'semi' or 'comma'
+    //       "requireLast": true
+    //     },
+    //     "singleline": {
+    //       "delimiter": "comma",    // 'semi' or 'comma'
+    //       "requireLast": false
+    //     }
+    //   }],
+    //   "@typescript-eslint/array-type": "warn",
+    //   "unused-imports/no-unused-imports": "warn",
+      "linebreak-style": "off",
+      "indent": ["error", 2],
+      "jsx-quotes": [2, "prefer-double"],
+      "comma-style": [2, "last"],
+      "comma-dangle": ["error", "never"],
+      "no-trailing-spaces": "error",
+      "object-curly-spacing" : ["error", "always"],
+      "no-multiple-empty-lines": [
+          "error",
+          {
+              "max": 1,
+              "maxEOF": 0
+          }
+      ],
+      "quotes": [ "error", "single"],
+      "semi": [ "error", "never"],
+      // "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/rules-of-hooks": "error"
+    }
+}
