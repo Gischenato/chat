@@ -1,12 +1,10 @@
+import React, { useEffect, useRef } from 'react'
 import { useAuth } from '@contexts/AuthContextProvider'
-import { useFetchChat } from '@hooks/useFetchChatMessages'
-import { useFetchUser } from '@hooks/useFetchUser'
 import { useFindUser } from '@hooks/useFindUser'
 import { RegularText, TitleText } from '@styles/typography'
 import { useQuery } from '@tanstack/react-query'
 import { getMessages } from '@util/api/messages/getMessages'
 import { findUser } from '@util/api/users/findUser'
-import React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Message from './Message'
@@ -14,46 +12,71 @@ import Input from './Input'
 import { useChat } from '@contexts/ChatContextProvider'
 import { toast } from 'react-toastify'
 import IMessage from '@interfaces/IMessage'
+import { SOCKET_EVENTS } from '@util/socket/socket_events'
 
 export default function Chat() {
   const { chatId, userId } = useParams()
   const { user:myUser } = useAuth()
   const { data:otherUser } = useFindUser(userId)
 
-  const { sendNewMessageMutation } = useChat()
+  const { sendNewMessageMutation, sendMessage:sendMessageSocket, socket } = useChat()
 
   const [page, setPage] = React.useState(1)
   const [messages, setMessages] = React.useState<IMessage[]>([])
+
+  const refScroll = useRef<HTMLDivElement>(null)
+  
+  useEffect(() => {
+    setMessages([])
+  }, [chatId])
 
   const messagesQuery = useQuery({
     queryKey: ['messages', chatId],
     queryFn: () => getMessages(chatId, page),
     onSuccess: (data) => {
       if (data.length === 0) return
-      setMessages([...messages, ...data])
+      // setMessages([...messages, ...data])
+      setMessages(data)
       setPage(page+1)
-    }
+    },
+    refetchOnWindowFocus: false,
+    
   })
-
+   
+  useEffect(() => {
+    if (!socket) return
+    socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, (data: any) => {
+      console.log('received message', data)
+      setMessages((prev) => [data, ...prev])
+    })
+    return () => {
+      socket.off(SOCKET_EVENTS.PRIVATE_MESSAGE)
+    }
+  }, [socket])
+  
   const sendMessage = (text: string) => {
+    if (text === '') return
     // console.log('sending message', text)
     if (!myUser || !chatId) return
-    sendNewMessageMutation.mutate({ chatId, text, senderId: myUser._id },{
-      onSuccess: () => {
-        messagesQuery.refetch()
-      },
-      onError: (err) => {
-        toast.error('Error sending message')
-      }
-    })
+    sendMessageSocket(text, otherUser!._id, chatId)
+    refScroll.current?.scrollIntoView({ behavior: 'smooth' })
+    
+    // sendNewMessageMutation.mutate({ chatId, text, senderId: myUser._id },{
+    //   onSuccess: () => {
+    //     messagesQuery.refetch()
+    //   },
+    //   onError: (err) => {
+    //     toast.error('Error sending message')
+    //   }
+    // })
   }
   
   return (
     <Container>
       <TitleText>Chat with {otherUser?.name}</TitleText>
-      <button onClick={() => {messagesQuery.refetch}}>More {page}</button>
+      {/* <button onClick={() => {messagesQuery.refetch}}>More {page}</button> */}
       <ChatContainer>
-        <MessagesContainer>
+        <MessagesContainer ref={refScroll}>
         { messagesQuery.status === 'loading' && <p>Loading...</p>}
         { messagesQuery.status === 'error' && <p>Error fetching messages</p>}
         { messagesQuery.status === 'success' && messages!.map(msg => 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { UseMutationResult, useMutation, useQuery } from '@tanstack/react-query'
 import { getChat } from '@util/api/chats/getUserChat'
 import IUser from '@interfaces/IUser'
@@ -11,6 +11,9 @@ import IPostNewChatResponse from '@interfaces/IPostNewChatResponse'
 import { postMessage } from '@util/api/messages/postMessage'
 import IPostMessageResponse from '@interfaces/IPostMessageResponse'
 import IPostMessage from '@interfaces/IPostMessage'
+import { Socket, io } from 'socket.io-client'
+import { useNavigate } from 'react-router-dom'
+import { SOCKET_EVENTS } from '@util/socket/socket_events'
 
 interface ChatContextData {
   userChats: IChat[] | undefined
@@ -19,6 +22,8 @@ interface ChatContextData {
   potentialChats: IUser[] | undefined
   createNewChatMutation: UseMutationResult<IPostNewChatResponse, unknown, IPostNewChat, unknown>
   sendNewMessageMutation: UseMutationResult<IPostMessageResponse, unknown, IPostMessage, unknown>
+  sendMessage: (message: string, to: string, chatId: string) => void
+  socket: Socket | null
 }
 
 interface ChatContextProviderProps {
@@ -31,6 +36,41 @@ const ChatContext = createContext<ChatContextData>({} as ChatContextData)
 export const useChat = () => useContext(ChatContext)
 
 export default function ChatContextProvider({ children, user }: ChatContextProviderProps) {
+  const [socket, setSocket] = useState<Socket | null>(null)
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/')
+      return
+    }
+    console.log('Connecting to socket.io server')
+    const newSocket = io("http://localhost:3000", { 
+      query: { id: user!._id },
+      auth: { id: user!._id },
+    })
+
+
+    newSocket.on(SOCKET_EVENTS.CONNECT, () => {
+      document.title = 'Connected'
+      console.log('Connected to socket.io server')
+    })
+
+    newSocket.on(SOCKET_EVENTS.DISCONNECT, () => {
+      document.title = 'Disconnected'
+      console.log('Disconnected from socket.io server')
+    })
+
+    setSocket(newSocket)
+
+    return () => {
+      console.log('Disconnecting from socket.io server')
+      newSocket.disconnect()
+      setSocket(null)
+    }
+  }, [user])
+
   const chatsQuery = useQuery<IChat[]>({
     queryKey: ['chats', user?._id],
     enabled: user !== undefined && user !== null,
@@ -90,6 +130,17 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
     }
   })
 
+  const sendMessage = (message: string, to: string, chatId:string) => {
+    if (!socket || !user) return
+    const msg = {
+      text: message,
+      sender: user._id,
+      receiver: to,
+      chatId
+    }
+    socket.emit(SOCKET_EVENTS.PRIVATE_MESSAGE, msg)
+  }
+
 
   const [potentialChats, setPotentialChats] = useState<Array<any>>([])
 
@@ -100,7 +151,9 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
       userChatsError: chatsQuery.isError,
       potentialChats,
       createNewChatMutation,
-      sendNewMessageMutation
+      sendNewMessageMutation,
+      sendMessage,
+      socket
     }}>
       {children}
     </ChatContext.Provider>

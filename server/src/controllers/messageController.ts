@@ -29,8 +29,8 @@ const getMessages = async (req:Request, res:Response) => {
     try {
         const messages = await messageModel
             .find({chatId})
-            .skip((Number(page) - 1) * limit)
-            .limit(limit)
+            // .skip((Number(page) - 1) * limit)
+            // .limit(limit)
             .sort({createdAt: -1})
         res.status(200).json(messages)
     } catch(error:any) {

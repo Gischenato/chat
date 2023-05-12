@@ -36,6 +36,7 @@ const LayoutContainer = styled.div`
     font-family: 'Quicksand';
     
     > a {
+      color: ${({ theme }) => theme.colors.purple};
       text-decoration: none;
       :hover {
         text-decoration: underline;
@@ -43,23 +44,3 @@ const LayoutContainer = styled.div`
     }
   }
 `
-
-// const Nav = styled.nav`
-//   display: flex;
-//   background-color: ${({ theme }) => theme.colors.background};
-//   /* gap: 2rem; */
-//   display: flex;
-//     gap: 2rem;
-//     background-color: #ececec;
-//     padding: 1rem;
-
-//     font-size: 2rem;
-//     font-family: 'Quicksand';
-    
-//     > a {
-//       text-decoration: none;
-//       :hover {
-//         text-decoration: underline;
-//       }
-//     }
-// `
