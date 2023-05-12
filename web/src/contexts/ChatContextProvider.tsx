@@ -8,6 +8,9 @@ import { postNewChat } from '@util/api/chats/createNewChat'
 import IPostNewChat from '@interfaces/IPostNewChat'
 import { Id, toast } from 'react-toastify'
 import IPostNewChatResponse from '@interfaces/IPostNewChatResponse'
+import { postMessage } from '@util/api/messages/postMessage'
+import IPostMessageResponse from '@interfaces/IPostMessageResponse'
+import IPostMessage from '@interfaces/IPostMessage'
 
 interface ChatContextData {
   userChats: IChat[] | undefined
@@ -15,6 +18,7 @@ interface ChatContextData {
   userChatsError: boolean
   potentialChats: IUser[] | undefined
   createNewChatMutation: UseMutationResult<IPostNewChatResponse, unknown, IPostNewChat, unknown>
+  sendNewMessageMutation: UseMutationResult<IPostMessageResponse, unknown, IPostMessage, unknown>
 }
 
 interface ChatContextProviderProps {
@@ -76,6 +80,17 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
     }  
   })
 
+  const sendNewMessageMutation = useMutation({
+    mutationFn: postMessage,
+    onSuccess: (data, variables) => {
+      console.log('Message sent successfully')
+    },
+    onError: (error, variables, context) => {
+      console.log('Error sending message');
+    }
+  })
+
+
   const [potentialChats, setPotentialChats] = useState<Array<any>>([])
 
   return (
@@ -85,6 +100,7 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
       userChatsError: chatsQuery.isError,
       potentialChats,
       createNewChatMutation,
+      sendNewMessageMutation
     }}>
       {children}
     </ChatContext.Provider>
