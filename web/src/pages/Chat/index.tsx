@@ -11,30 +11,52 @@ import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Message from './Message'
 import Input from './Input'
+import { useChat } from '@contexts/ChatContextProvider'
+import { toast } from 'react-toastify'
+import IMessage from '@interfaces/IMessage'
 
 export default function Chat() {
   const { chatId, userId } = useParams()
   const { user:myUser } = useAuth()
   const { data:otherUser } = useFindUser(userId)
 
+  const { sendNewMessageMutation } = useChat()
+
+  const [page, setPage] = React.useState(1)
+  const [messages, setMessages] = React.useState<IMessage[]>([])
+
   const messagesQuery = useQuery({
     queryKey: ['messages', chatId],
-    queryFn: () => getMessages(chatId),
+    queryFn: () => getMessages(chatId, page),
+    onSuccess: (data) => {
+      if (data.length === 0) return
+      setMessages([...messages, ...data])
+      setPage(page+1)
+    }
   })
 
   const sendMessage = (text: string) => {
-    console.log('sending message', text)
+    // console.log('sending message', text)
+    if (!myUser || !chatId) return
+    sendNewMessageMutation.mutate({ chatId, text, senderId: myUser._id },{
+      onSuccess: () => {
+        messagesQuery.refetch()
+      },
+      onError: (err) => {
+        toast.error('Error sending message')
+      }
+    })
   }
-  
   
   return (
     <Container>
       <TitleText>Chat with {otherUser?.name}</TitleText>
+      <button onClick={() => {messagesQuery.refetch}}>More {page}</button>
       <ChatContainer>
         <MessagesContainer>
         { messagesQuery.status === 'loading' && <p>Loading...</p>}
         { messagesQuery.status === 'error' && <p>Error fetching messages</p>}
-        { messagesQuery.status === 'success' && messagesQuery.data.map(msg => 
+        { messagesQuery.status === 'success' && messages!.map(msg => 
             <Message key={msg._id} message={msg} isMine={msg.senderId===myUser?._id}/>
         )}
         </MessagesContainer>
