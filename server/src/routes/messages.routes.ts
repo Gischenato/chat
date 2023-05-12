@@ -5,4 +5,4 @@ export const messageRouter = express.Router();
 
 messageRouter.post("/", messageController.createMessage)
 
-messageRouter.get("/:chatId", messageController.getMessages)
+messageRouter.get("/:chatId/:page", messageController.getMessages)
