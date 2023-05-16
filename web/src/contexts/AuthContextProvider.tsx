@@ -101,7 +101,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   const handleLogIn = (user:IUser) => {
     setUser(user)
-    localStorage.setItem('@chat:userId', user._id)
+    // localStorage.setItem('@chat:userId', user._id)
     sessionStorage.setItem('@chat:user', JSON.stringify(user))
     setIsAuthenticated(true)
   }
