@@ -43,13 +43,15 @@ io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
     })
 
     socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, async (msg: IMessage) => {
-        const { receiver, sender, text, chatId } = msg
+        const { receiver, senderId, text, chatId, id } = msg
 
         const message = new messageModel({
             chatId,
-            senderId: sender,
-            text
+            senderId,
+            text,
+            _id: id
         })
+
         const response = await message.save()
 
         console.log('=====================================');
@@ -58,7 +60,7 @@ io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
         console.log(users)
         console.log('-------------------------------------');
         const receiverSocketId = users.get(msg.receiver)
-        const senderSocketId = users.get(msg.sender)
+        const senderSocketId = users.get(msg.senderId)
 
         if (!receiverSocketId) {
             console.log("Receiver not found: ", receiver)
