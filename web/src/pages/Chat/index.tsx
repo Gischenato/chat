@@ -1,16 +1,13 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@contexts/AuthContextProvider'
 import { useFindUser } from '@hooks/useFindUser'
 import { RegularText, TitleText } from '@styles/typography'
-import { useQuery } from '@tanstack/react-query'
 import { getMessages } from '@util/api/messages/getMessages'
-import { findUser } from '@util/api/users/findUser'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Message from './Message'
 import Input from './Input'
 import { useChat } from '@contexts/ChatContextProvider'
-import { toast } from 'react-toastify'
 import IMessage from '@interfaces/IMessage'
 import { SOCKET_EVENTS } from '@util/socket/socket_events'
 
@@ -19,35 +16,48 @@ export default function Chat() {
   const { user:myUser } = useAuth()
   const { data:otherUser } = useFindUser(userId)
 
-  const { sendNewMessageMutation, sendMessage:sendMessageSocket, socket } = useChat()
-
-  const [page, setPage] = React.useState(1)
-  const [messages, setMessages] = React.useState<IMessage[]>([])
+  const { sendMessage:sendMessageSocket, 
+    socket, messages, setMessages, shouldFetchChat, updateFetchedChats,
+    updateMessages
+  } = useChat()
 
   const refScroll = useRef<HTMLDivElement>(null)
+
+  const fetchMessagesPage = async (page: number) => {
+    if (!chatId) return
+    try {
+      const data = await getMessages(chatId, page)
+      // updateFetchedChats(chatId)
+      console.log("dasdasasddskodsko")
+      updateMessages(chatId, data, "old")
+    } catch(err: any) {
+      return
+    }
+  }
+
+  const createNewChat = () => {
+    setMessages(old => {
+      if (!chatId || old[chatId] !== undefined) return old
+      console.log('creating new chat')
+      return {...old, [chatId]: []}
+    })
+  }
   
   useEffect(() => {
-    setMessages([])
+    if (!chatId) return
+    createNewChat()
+    const page = shouldFetchChat(chatId)
+    if (page === 1) fetchMessagesPage(page)
   }, [chatId])
 
-  const messagesQuery = useQuery({
-    queryKey: ['messages', chatId],
-    queryFn: () => getMessages(chatId, page),
-    onSuccess: (data) => {
-      if (data.length === 0) return
-      // setMessages([...messages, ...data])
-      setMessages(data)
-      setPage(page+1)
-    },
-    refetchOnWindowFocus: false,
-    
-  })
+
+
    
   useEffect(() => {
     if (!socket) return
-    socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, (data: any) => {
+    socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, (data: IMessage) => {
       console.log('received message', data)
-      setMessages((prev) => [data, ...prev])
+      updateMessages(data.chatId, [data])
     })
     return () => {
       socket.off(SOCKET_EVENTS.PRIVATE_MESSAGE)
@@ -60,26 +70,18 @@ export default function Chat() {
     if (!myUser || !chatId) return
     sendMessageSocket(text, otherUser!._id, chatId)
     refScroll.current?.scrollIntoView({ behavior: 'smooth' })
-    
-    // sendNewMessageMutation.mutate({ chatId, text, senderId: myUser._id },{
-    //   onSuccess: () => {
-    //     messagesQuery.refetch()
-    //   },
-    //   onError: (err) => {
-    //     toast.error('Error sending message')
-    //   }
-    // })
+
   }
-  
+
+  const currentMessages = chatId ? messages[chatId] ? messages[chatId] : [] : []
+
   return (
     <Container>
       <TitleText>Chat with {otherUser?.name}</TitleText>
-      {/* <button onClick={() => {messagesQuery.refetch}}>More {page}</button> */}
+      <button onClick={() => {fetchMessagesPage(shouldFetchChat(chatId!))}}>More</button>
       <ChatContainer>
         <MessagesContainer ref={refScroll}>
-        { messagesQuery.status === 'loading' && <p>Loading...</p>}
-        { messagesQuery.status === 'error' && <p>Error fetching messages</p>}
-        { messagesQuery.status === 'success' && messages!.map(msg => 
+        { currentMessages.length > 0 && currentMessages!.map(msg => 
             <Message key={msg._id} message={msg} isMine={msg.senderId===myUser?._id}/>
         )}
         </MessagesContainer>

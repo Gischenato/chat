@@ -14,6 +14,8 @@ import IPostMessage from '@interfaces/IPostMessage'
 import { Socket, io } from 'socket.io-client'
 import { useNavigate } from 'react-router-dom'
 import { SOCKET_EVENTS } from '@util/socket/socket_events'
+import { v4 as uuidv4 } from 'uuid'
+import IMessage from '@interfaces/IMessage'
 
 interface ChatContextData {
   userChats: IChat[] | undefined
@@ -24,11 +26,24 @@ interface ChatContextData {
   sendNewMessageMutation: UseMutationResult<IPostMessageResponse, unknown, IPostMessage, unknown>
   sendMessage: (message: string, to: string, chatId: string) => void
   socket: Socket | null
+  messages: MessageTest
+  setMessages: React.Dispatch<React.SetStateAction<MessageTest>>
+  updateFetchedChats: (chatId: string, current: number) => void
+  shouldFetchChat: (chatId: string) => number
+  updateMessages: (chatId: string | undefined, data: IMessage[], type?:"new" | "old") => void
 }
 
 interface ChatContextProviderProps {
   children: React.ReactNode
   user: IUser | undefined
+}
+
+type MessageTest = {
+  [key: string]: IMessage[]
+}
+
+type FetchetChats = {
+  [key: string]: number
 }
 
 const ChatContext = createContext<ChatContextData>({} as ChatContextData)
@@ -38,11 +53,30 @@ export const useChat = () => useContext(ChatContext)
 export default function ChatContextProvider({ children, user }: ChatContextProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null)
 
+  const [messages, setMessages] = useState<MessageTest>({})
+  const [fetchedChats, setFetchedChats] = useState<FetchetChats>({})
+
   const navigate = useNavigate()
 
   useEffect(() => {
+    console.log('fetchedChats', fetchedChats)
+  }, [fetchedChats])
+
+  const updateFetchedChats = (chatId: string, current: number) => {
+    console.log('UPDATING FETCHED', chatId, current, fetchedChats)
+    setFetchedChats((prev) => ({
+      ...prev,
+      [chatId]: current + (chatId in prev ? prev[chatId] : 0),
+    }))
+  }
+
+  const shouldFetchChat = (chatId: string) => {
+    return fetchedChats[chatId] === undefined ? 0 : fetchedChats[chatId]
+  }
+
+  useEffect(() => {
     if (!user) {
-      navigate('/')
+      // navigate('/')
       return
     }
     console.log('Connecting to socket.io server')
@@ -134,13 +168,26 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
     if (!socket || !user) return
     const msg = {
       text: message,
-      sender: user._id,
+      senderId: user._id,
       receiver: to,
-      chatId
+      chatId,
+      id: uuidv4(),
     }
+    console.log('Sending message')
+    console.log(msg)
     socket.emit(SOCKET_EVENTS.PRIVATE_MESSAGE, msg)
   }
 
+  const updateMessages = (chatId: string | undefined, data: IMessage[], type?:"new" | "old") => {
+    if (!type) type = "new"
+    if (!chatId) return
+    console.log('updating messages')
+    setMessages(old => {
+      const newData = type === 'old' ? [...old[chatId], ...data] : [...data, ...old[chatId]]
+      return {...old, [chatId]: newData}
+    })
+    updateFetchedChats(chatId, data.length)
+  }
 
   const [potentialChats, setPotentialChats] = useState<Array<any>>([])
 
@@ -153,7 +200,12 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
       createNewChatMutation,
       sendNewMessageMutation,
       sendMessage,
-      socket
+      socket,
+      messages,
+      setMessages,
+      updateFetchedChats,
+      shouldFetchChat,
+      updateMessages,
     }}>
       {children}
     </ChatContext.Provider>
