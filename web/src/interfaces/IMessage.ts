@@ -5,5 +5,5 @@ export default interface IMessage {
     text: string,
     createdAt: string,
     updatedAt: string,
-    __v: number
+    __v?: number
 }
