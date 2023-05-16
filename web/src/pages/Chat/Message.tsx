@@ -19,13 +19,13 @@ export default function Message({ message, isMine }: MessageProps ) {
 
 const Container = styled.div<{ isMine?: boolean }>`
   display: flex;
+  flex-direction: column;
   ${({ isMine }) => css`
-    > p {
-      background-color: ${isMine ? 'aliceblue' : 'aquamarine'};
-      max-width: 50%;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    justify-content: ${isMine ? 'flex-end' : 'flex-start'};
+  width: fit-content;
+  align-self: ${isMine ? 'flex-end' : 'flex-start'};
+  background-color: ${isMine ? 'aliceblue' : 'aquamarine'};
+  max-width: 50%;
+  padding: 8px;
+  border-radius: 8px;
   `}
 `
