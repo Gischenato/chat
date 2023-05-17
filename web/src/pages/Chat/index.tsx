@@ -10,6 +10,7 @@ import Input from './Input'
 import { useChat } from '@contexts/ChatContextProvider'
 import IMessage from '@interfaces/IMessage'
 import { SOCKET_EVENTS } from '@util/socket/socket_events'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function Chat() {
   const { chatId, userId } = useParams()
@@ -35,7 +36,7 @@ export default function Chat() {
     }
   }
 
-  const createNewChat = () => {
+  const createNewChat = (chatId: string) => {
     setMessages(old => {
       if (!chatId || old[chatId] !== undefined) return old
       console.log('creating new chat')
@@ -45,7 +46,7 @@ export default function Chat() {
   
   useEffect(() => {
     if (!chatId) return
-    createNewChat()
+    createNewChat(chatId)
     const page = shouldFetchChat(chatId)
     if (page === 1) fetchMessagesPage(page)
   }, [chatId])
@@ -57,6 +58,7 @@ export default function Chat() {
     if (!socket) return
     socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, (data: IMessage) => {
       console.log('received message', data)
+      createNewChat(data.chatId)
       updateMessages(data.chatId, [data])
     })
     return () => {
@@ -67,9 +69,20 @@ export default function Chat() {
   const sendMessage = (text: string) => {
     if (text === '') return
     // console.log('sending message', text)
-    if (!myUser || !chatId) return
-    sendMessageSocket(text, otherUser!._id, chatId)
+    if (!myUser || !chatId || !otherUser) return
     refScroll.current?.scrollIntoView({ behavior: 'smooth' })
+    const time = new Date().toISOString() + '00:00'
+    const newMessage: IMessage = {
+      _id: uuidv4(),
+      chatId,
+      senderId: myUser._id,
+      text,
+      createdAt: time,
+      updatedAt: time
+    }
+
+    updateMessages(chatId, [newMessage], "new")
+    sendMessageSocket({message: newMessage, receiver: otherUser._id})
 
   }
 

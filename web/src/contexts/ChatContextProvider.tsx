@@ -17,6 +17,11 @@ import { SOCKET_EVENTS } from '@util/socket/socket_events'
 import { v4 as uuidv4 } from 'uuid'
 import IMessage from '@interfaces/IMessage'
 
+type ISendMessage = {
+  message: IMessage
+  receiver: string
+}
+
 interface ChatContextData {
   userChats: IChat[] | undefined
   isUserChatsLoading: boolean
@@ -24,7 +29,8 @@ interface ChatContextData {
   potentialChats: IUser[] | undefined
   createNewChatMutation: UseMutationResult<IPostNewChatResponse, unknown, IPostNewChat, unknown>
   sendNewMessageMutation: UseMutationResult<IPostMessageResponse, unknown, IPostMessage, unknown>
-  sendMessage: (message: string, to: string, chatId: string) => void
+  // sendMessage: () => void
+  sendMessage: (obj: ISendMessage) => void
   socket: Socket | null
   messages: MessageTest
   setMessages: React.Dispatch<React.SetStateAction<MessageTest>>
@@ -164,18 +170,18 @@ export default function ChatContextProvider({ children, user }: ChatContextProvi
     }
   })
 
-  const sendMessage = (message: string, to: string, chatId:string) => {
+  const sendMessage = (obj: ISendMessage) => {
     if (!socket || !user) return
-    const msg = {
-      text: message,
-      senderId: user._id,
-      receiver: to,
-      chatId,
-      id: uuidv4(),
-    }
+    // const msg = {
+    //   text: message,
+    //   senderId: user._id,
+    //   receiver: to,
+    //   chatId,
+    //   id: uuidv4(),
+    // }
     console.log('Sending message')
-    console.log(msg)
-    socket.emit(SOCKET_EVENTS.PRIVATE_MESSAGE, msg)
+    console.log(obj)
+    socket.emit(SOCKET_EVENTS.PRIVATE_MESSAGE, obj)
   }
 
   const updateMessages = (chatId: string | undefined, data: IMessage[], type?:"new" | "old") => {
