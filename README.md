@@ -12,4 +12,7 @@ A chat using socket.io + react
 - [Express](https://expressjs.com/pt-br/) framework.
 
 ### Database ERD
-![Diagrama banco](https://github.com/Gischenato/chat/assets/45777166/0eaebf65-03c8-48c4-b5ac-ecca9df2bbc0)
+![image](https://github.com/Gischenato/chat/assets/45777166/f981d6d3-02e7-4ec3-9df8-6479d510ea2a)
+
+### Miro
+https://miro.com/app/board/uXjVMHueO0M=/#tpicker-content
